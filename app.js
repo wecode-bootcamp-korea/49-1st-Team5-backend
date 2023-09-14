@@ -7,9 +7,8 @@ const dotenv = require("dotenv");
 const morgan = require("morgan");
 dotenv.config();
 const port = process.env.PORT || 8000;
-const createPost = require("./userService/createPost.js/index.js");
 const { DataSource } = require("typeorm");
-
+const createPost = require("./createPost.js");
 const myDataSource = new DataSource({
   type: process.env.DB_CONNECTION,
   host: process.env.DB_HOST,
@@ -36,7 +35,7 @@ app.get("/", async (req, res) => {
   }
 });
 // Service API
-app.post("/create", createPost.createPost);
+app.post("/createPost", createPost.createPost);
 
 const server = http.createServer(app);
 const start = async () => {

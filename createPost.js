@@ -27,7 +27,7 @@ myDataSource.initialize().then(() => {
 app.use(cors());
 app.use(express.json());
 app.use(morgan("combined"));
-
+//app.post("/create", createPost.createPost);
 const createPost = async (req, res) => {
   try {
     // 1. 요청 정보 받아옴
@@ -55,13 +55,18 @@ const createPost = async (req, res) => {
       throw error;
     }
     console.log("he");
+    const decoded = jwt.decode(auth, { complete: true });
+    console.log(decoded);
+    console.log(auth);
     const createData = await myDataSource.query(
       `
      INSERT INTO threads(
+       user_id,
        content
      )
      VALUES(?)
      `,
+      [decoded],
       [content]
     );
     console.log("ho");
