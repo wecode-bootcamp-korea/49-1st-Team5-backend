@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000
 
 const { DataSource } = require('typeorm');
 
-const myDataSource = new DataSource({
+const AppDataSource = new DataSource({
   type: process.env.DB_CONNECTION,
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -19,7 +19,7 @@ const myDataSource = new DataSource({
   database: process.env.DB_DATABASE
 })
 
-myDataSource.initialize()
+AppDataSource.initialize()
   .then(() => {
     console.log("Data Source has been initialized!")
   });
@@ -44,7 +44,7 @@ app.get('/', async (req, res) => {
 
 app.get('/threads', async (req, res) => {
   try {
-    const threadsData = await myDataSource.query(`SELECT threads.id, users.nickname, users.profile_image, threads.content, threads.created_at, threads.updated_at
+    const threadsData = await AppDataSource.query(`SELECT threads.id, users.nickname, users.profile_image, threads.content, threads.created_at, threads.updated_at
   FROM threads
   INNER JOIN users ON threads.user_id = users.id ORDER BY threads.created_at DESC;
   `)
@@ -52,13 +52,12 @@ app.get('/threads', async (req, res) => {
     console.log("TYPE OF: ", typeof threadsData)
 
     // 데이터X ----> 빈 배열 반환
-    const emptyData = [];
+    console.log("threadsDate length: ", threadsData.length)
 
-  console. log("threadsDate length: ", threadsData.length)
-  if(threadsData.length === 0){
-    return res.status(200).json(
-      emptyData )
-  }
+    if (threadsData.length === 0) {
+      return res.status(200).json(
+        [])
+    }
 
 
 
@@ -66,7 +65,7 @@ app.get('/threads', async (req, res) => {
 
 
     return res.status(200).json({
-      "users": userData
+      "threads": threadsData
     })
   }
 
