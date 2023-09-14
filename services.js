@@ -1,31 +1,59 @@
 const http = require("http");
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv").config();
-const app = express();
-const { DataSource } = require("typeorm");
-const morgan = require("morgan");
 const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
+const morgan = require("morgan");
+const mysql = require("mysql2");
 
+const { DataSource } = require("typeorm");
+
+const myDataSource = new DataSource({
+  type: process.env.DB_CONNECTION,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+});
+
+const app = express();
 app.use(cors());
-app.use(morgan("combined"));
 app.use(express.json());
+app.use(morgan("combined"));
 
-app.get("/home", async (req, res) => {
+app.get("/", async (req, res) => {
   try {
-    return res.status(200).json({
-      message: "team5 home Server! ",
-    });
+    return res.status(200).json({ message: "Welcome to 49-1st-Team5 sever!" });
   } catch (err) {
     console.log(err);
   }
 });
 
-app.get("/getUsers", async (req, res) => {
+app.get("/Users", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const userData = await myDataSource.query(
+      "SELECT id, email, password FROM USERS"
+    );
+    return res.status(200).json({
+      USERS: "users",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
 
-    if (name === undefined || email === undefined || password === undefined) {
+app.post("/Users/create", async (req, res) => {
+  try {
+    const { nickname, email, password, phone_number, birth_day } = req.body;
+    if (
+      nickname === undefined ||
+      email === undefined ||
+      password === undefined ||
+      phone_number === undefined ||
+      birth_day === undefined
+    ) {
       const error = new Error("KEY_ERROR");
       error.statusCode = 400;
       throw error;
@@ -44,8 +72,8 @@ app.get("/getUsers", async (req, res) => {
     }
 
     const emailCheck = await myDataSource.query(`
-        SELECT name, email, password FROM users WHERE email="${email}"
-        `);
+    SELECT id, email FROM users WHERE email="${email}"
+    `);
 
     if (emailCheck.length > 0) {
       const error = new Error("NOT_TRUE_EMAIL");
@@ -56,20 +84,25 @@ app.get("/getUsers", async (req, res) => {
     const userData = await myDataSource.query(`
         INSERT INTO users
         (
-        name,
+        nickname,
         email,
-        password
+        password,
+        phone_number,
+        birth_day
         )
 
         VALUES
         (
-        "${name}",
+        "${nickname}",
         "${email}",
-        "${password}")
+        "${password}",
+        "${phone_number}",
+        "${birth_day}"
+        )
         `);
 
     return res.status(201).json({
-      message: "crate user!",
+      message: "SUCCESS",
     });
   } catch (err) {
     console.log(err);
@@ -79,7 +112,7 @@ app.get("/getUsers", async (req, res) => {
   }
 });
 
-app.post("/login", async (req, res) => {
+app.post("/users/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -90,7 +123,7 @@ app.post("/login", async (req, res) => {
     }
 
     const DbCheck = await myDataSource.query(`
-      SELECT * FROM users WHERE email = "${email}" AND password = "${password}"
+    SELECT * FROM users WHERE email="${email}" AND password = "${password}"
       `);
 
     console.log(DbCheck);
@@ -101,7 +134,7 @@ app.post("/login", async (req, res) => {
       throw error;
     }
 
-    const loginToken = jwt.sign({ id: userCheck[0].id }, "loginToken");
+    const loginToken = jwt.sign({ id: DbCheck[0].id }, "loginToken");
 
     return res.status(200).json({
       message: "login complete",
@@ -117,12 +150,15 @@ app.post("/login", async (req, res) => {
 
 const server = http.createServer(app);
 
-const start = async () => {
+const start = () => {
   try {
     server.listen(8000, () => console.log(`Server is listening on 8000`));
   } catch (err) {
     console.error(err);
   }
 };
+myDataSource.initialize().then(() => {
+  console.log("Data Source has been initialized!");
+});
 
 start();
