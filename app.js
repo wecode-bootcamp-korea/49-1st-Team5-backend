@@ -37,7 +37,7 @@ app.get('/', async (req, res) => {
     console.log(err)
   }
 })
-
+app.post("/createPost", createPost.createPost);
 const server = http.createServer(app)
 const start = async () => {
   try {
