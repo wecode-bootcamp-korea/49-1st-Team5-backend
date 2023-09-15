@@ -405,4 +405,8 @@ zsdoc/data
 /tests/_output/*
 !/tests/_output/.gitkeep
 
+<<<<<<< HEAD
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,vim,webstorm,macos,linux,windows,zsh,node,dotenv
+=======
+# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,vim,webstorm,macos,linux,windows,zsh,node,dotenv
+>>>>>>> e1b5a916089e10366d8d63bb56be1f106ef5b128
