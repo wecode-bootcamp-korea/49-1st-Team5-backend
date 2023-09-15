@@ -1,5 +1,6 @@
 const http = require("http");
 const express = require("express");
+//
 const app = express();
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
@@ -7,7 +8,7 @@ const dotenv = require("dotenv");
 const morgan = require("morgan");
 dotenv.config();
 const port = process.env.PORT || 8000;
-
+//express ㅇ웹 프로그래밍 매개
 const { DataSource } = require("typeorm");
 
 const myDataSource = new DataSource({
@@ -18,15 +19,21 @@ const myDataSource = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
 });
-console.log(myDataSource);
-console.log("hi");
+
 myDataSource.initialize().then(() => {
   console.log("Data Source has been initialized!");
 });
+//const app = express();
+//app이라는 변수 안에 있는
+//express라는 FW의
+//app.use('/',cors());
 
 app.use(cors());
+//cors 서버 통신 완화시켜줌
 app.use(express.json());
+//외부에서 들어온 정보- json parsing해줌
 app.use(morgan("combined"));
+//morgan은 서버 현상 로깅해줌
 //app.post("/create", createPost.createPost);
 const createPost = async (req, res) => {
   try {
@@ -38,8 +45,8 @@ const createPost = async (req, res) => {
     const content = post.content;
 
     // 2. user 정보 console.log로 확인 한 번!
-    console.log("headers: ", header);
-    console.log("post: ", post);
+    // console.log("headers: ", header);
+    //console.log("post: ", post);
     //예외 처리 1 - 로그인하지 않은 사용자는 thread post 금지
     if (auth.length === 0) {
       // existing user 이용해서 판별`
@@ -55,20 +62,22 @@ const createPost = async (req, res) => {
       throw error;
     }
     console.log("he");
-    const decoded = jwt.decode(auth, { complete: true });
+    const decoded = jwt.decode(auth);
     console.log(decoded);
     console.log(auth);
+    const id = decoded["id"];
+    console.log(id);
     const createData = await myDataSource.query(
       `
      INSERT INTO threads(
-       user_id,
+        user_id,        
        content
      )
-     VALUES(?)
+     VALUES(?,?)
      `,
-      [decoded],
-      [content]
+      [id, content]
     );
+
     console.log("ho");
     // 4. DB data 저장 여부 확인
     console.log("created posts", createData.content);
