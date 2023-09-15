@@ -1,14 +1,14 @@
-const http = require('http')
-const express = require('express')
-const app = express()
-const cors = require('cors')
-const jwt = require("jsonwebtoken")
-const dotenv = require("dotenv")
-const morgan = require('morgan')
-dotenv.config()
-const port = process.env.PORT || 3000
+const http = require("http");
+const express = require("express");
+const app = express();
+const cors = require("cors");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+const morgan = require("morgan");
+dotenv.config();
+const port = process.env.PORT || 3000;
 
-const { DataSource } = require('typeorm');
+const { DataSource } = require("typeorm");
 
 const AppDataSource = new DataSource({
   type: process.env.DB_CONNECTION,
@@ -16,27 +16,24 @@ const AppDataSource = new DataSource({
   port: process.env.DB_PORT,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE
-})
+  database: process.env.DB_DATABASE,
+});
 
-AppDataSource.initialize()
-  .then(() => {
-    console.log("Data Source has been initialized!")
-  });
+AppDataSource.initialize().then(() => {
+  console.log("Data Source has been initialized!");
+});
 
-app.use(cors())
-app.use(express.json())
-app.use(morgan('combined'))
+app.use(cors());
+app.use(express.json());
+app.use(morgan("combined"));
 
-
-app.get('/', async (req, res) => {
+app.get("/", async (req, res) => {
   try {
-    return res.status(200).json({ "message": "Welcome to 49-1st-Team5 sever!" })
+    return res.status(200).json({ message: "Welcome to 49-1st-Team5 sever!" });
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-
-})
+});
 
 // 회원가입
 
@@ -54,8 +51,9 @@ app.get("/Users", async (req, res) => {
   }
 });
 
-
 // 유저 회원가입
+//const userSignup = async (req, res) => {
+//app.post("/users/create", async (req, res) => {
 app.post("/Users/create", async (req, res) => {
   try {
     const { nickname, email, password, phone_number, birth_day } = req.body;
@@ -117,17 +115,13 @@ app.post("/Users/create", async (req, res) => {
       message: "SUCCESS",
     });
   } catch (error) {
-    console.log(error)
-    return res.status(error.statusCode).json({ "message": error.message })
+    console.log(error);
+    return res.status(error.statusCode).json({ message: error.message });
   }
 });
 
-
-
-
 //로그인
-
-
+//const userLogin = async (req, res) => {
 app.post("/users/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -157,22 +151,24 @@ app.post("/users/login", async (req, res) => {
       token: loginToken,
     });
   } catch (error) {
-    console.log(error)
-    return res.status(error.statusCode).json({ "message": error.message })
+    console.log(error);
+    return res.status(error.statusCode).json({ message: error.message });
   }
 });
 
-
-
-
-
-const server = http.createServer(app)
+const server = http.createServer(app);
 const start = async () => {
   try {
-    server.listen(port, () => console.log(`Server is listening on`))
+    server.listen(port, () => console.log(`Server is listening on`));
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
-}
+};
 
-start()
+start();
+/*
+module.exports = {
+  userSignup,
+  userLogin,
+};
+*/
