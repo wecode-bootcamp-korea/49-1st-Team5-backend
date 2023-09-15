@@ -1,3 +1,4 @@
+
 const http = require('http')
 const express = require('express')
 const app = express()
@@ -9,6 +10,7 @@ dotenv.config()
 const port = process.env.PORT || 8000
 
 const { DataSource } = require('typeorm');
+const createPost = require("./createPost.js");
 
 const AppDataSource = new DataSource({
   type: process.env.DB_CONNECTION,
@@ -46,3 +48,4 @@ const start = async () => {
 }
 
 start()
+
